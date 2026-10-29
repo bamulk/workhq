@@ -5,7 +5,7 @@ import { fetchHomeValue } from "@/lib/rentcast";
 export const dynamic = "force-dynamic";
 
 /**
- * Monthly refresh of every rental's home value (scheduled in vercel.json).
+ * Monthly refresh of every rental's and the primary home's value (scheduled in vercel.json).
  * Vercel sends `Authorization: Bearer $CRON_SECRET`; anything else is refused.
  */
 export async function GET(req: NextRequest) {
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   const { data: rentals, error } = await supabase
     .from("entities")
     .select("id, name, address")
-    .eq("type", "rental")
+    .in("type", ["rental", "home"])
     .eq("archived", false)
     .not("address", "is", null);
   if (error) return Response.json({ error: error.message }, { status: 500 });

@@ -31,7 +31,7 @@ create trigger on_auth_user_created
 create table if not exists public.entities (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  type text not null check (type in ('business','rental')),
+  type text not null check (type in ('business','rental','home')),
   subtype text,                       -- 'it','sober_living','real_estate', or null
   slug text not null unique,          -- stable key for future connectors
   address text,                       -- mainly for rental houses

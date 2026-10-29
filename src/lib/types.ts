@@ -1,4 +1,5 @@
-export type EntityType = "business" | "rental";
+/** "home" is a primary residence: tracked for equity, kept out of cash flow. */
+export type EntityType = "business" | "rental" | "home";
 export type CategoryKind = "income" | "expense";
 export type Direction = "in" | "out";
 

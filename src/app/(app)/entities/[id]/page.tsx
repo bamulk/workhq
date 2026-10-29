@@ -60,11 +60,13 @@ export default async function EntityDetailPage({
   const mortgages = (mortgageRows ?? []) as Mortgage[];
   const equity = equityFor(valuation, mortgages);
   const waitUntil = nextRefreshAt(valuation);
+  const isHome = entity.type === "home";
+  const isProperty = entity.type === "rental" || isHome;
 
   const archiveAction = setEntityArchivedAction.bind(null, id, !entity.archived);
   const deleteAction = deleteEntityAction.bind(null, id);
   const subtitle = [
-    entity.type === "rental" ? "Rental house" : "Business",
+    entity.type === "rental" ? "Rental house" : entity.type === "home" ? "Primary home" : "Business",
     entity.subtype ? titleize(entity.subtype) : null,
     entity.address,
     entity.archived ? "Archived" : null,
@@ -80,9 +82,11 @@ export default async function EntityDetailPage({
         back={{ href: "/entities", label: "Entities" }}
         actions={
           <>
-            <LinkButton href={`/transactions/new?entity=${entity.id}`} size="sm">
-              <Plus size={14} /> Add
-            </LinkButton>
+            {!isHome && (
+              <LinkButton href={`/transactions/new?entity=${entity.id}`} size="sm">
+                <Plus size={14} /> Add
+              </LinkButton>
+            )}
             <LinkButton href={`/entities/${id}/edit`} variant="secondary" size="sm">
               <Pencil size={14} /> Edit
             </LinkButton>
@@ -90,11 +94,14 @@ export default async function EntityDetailPage({
         }
       />
 
-      <PeriodTabs current={range.key} from={sp.from} to={sp.to} basePath={`/entities/${id}`} />
+      {!isHome && (
+        <>
+          <PeriodTabs current={range.key} from={sp.from} to={sp.to} basePath={`/entities/${id}`} />
+          <KeyFigures summary={summary} label={range.label} />
+        </>
+      )}
 
-      <KeyFigures summary={summary} label={range.label} />
-
-      {entity.type === "rental" && (
+      {isProperty && (
         <Section title="Equity">
           <EquityFigures value={equity.value} owed={equity.owed} equity={equity.equity} />
 
@@ -168,7 +175,7 @@ export default async function EntityDetailPage({
         </Section>
       )}
 
-      {txns.length === 0 ? (
+      {isHome ? null : txns.length === 0 ? (
         <EmptyState
           title="Nothing recorded"
           description={`No money in or out for ${entity.name} in this period.`}

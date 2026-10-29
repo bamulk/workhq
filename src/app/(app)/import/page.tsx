@@ -25,7 +25,7 @@ const statusLabel: Record<BatchRow["status"], string> = {
 export default async function ImportPage() {
   const supabase = await createClient();
   const [{ data: entities }, { data: batches }] = await Promise.all([
-    supabase.from("entities").select("id, name").eq("archived", false).order("sort_order"),
+    supabase.from("entities").select("id, name").eq("archived", false).neq("type", "home").order("sort_order"),
     supabase
       .from("import_batches")
       .select("id, filename, status, inserted_count, skipped_count, created_at, entities(name)")
