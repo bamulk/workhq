@@ -72,3 +72,28 @@ export interface ImportBatch {
   created_at: string;
   created_by: string | null;
 }
+
+export interface HomeValuation {
+  id: string;
+  entity_id: string;
+  value: number;
+  value_low: number | null;
+  value_high: number | null;
+  source: string;
+  details: Record<string, unknown> | null;
+  fetched_at: string;
+}
+
+export interface Mortgage {
+  id: string;
+  entity_id: string;
+  lender: string | null;
+  balance: number;
+  balance_as_of: string; // YYYY-MM-DD
+  interest_rate: number | null; // annual %
+  monthly_payment: number | null; // principal + interest
+  payoff_date: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
