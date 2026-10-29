@@ -25,10 +25,11 @@ export default function EntityForm({
           <Select name="type" defaultValue={e.type ?? "business"}>
             <option value="business">Business</option>
             <option value="rental">Rental house</option>
+            <option value="home">Primary home</option>
           </Select>
         </Field>
         <div className="sm:col-span-2">
-          <Field label="Address" hint="Street, city, state, ZIP. Rentals need it to pull a home value.">
+          <Field label="Address" hint="Street, city, state, ZIP. Houses need it to pull a home value.">
             <Input name="address" defaultValue={e.address ?? ""} />
           </Field>
         </div>

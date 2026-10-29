@@ -27,7 +27,7 @@ function entityFields(formData: FormData) {
   const type = String(formData.get("type") || "business").trim();
   return {
     name: String(formData.get("name") || "").trim(),
-    type: type === "rental" ? "rental" : "business",
+    type: type === "rental" || type === "home" ? type : "business",
     subtype: str(formData.get("subtype")),
     address: str(formData.get("address")),
     sort_order: int(formData.get("sort_order")),

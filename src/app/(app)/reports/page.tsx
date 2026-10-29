@@ -27,7 +27,7 @@ export default async function ReportsPage() {
   const since = months[0].key + "-01";
 
   const [{ data: entityRows }, { data: txnRows }] = await Promise.all([
-    supabase.from("entities").select("*").eq("archived", false).order("sort_order"),
+    supabase.from("entities").select("*").eq("archived", false).neq("type", "home").order("sort_order"),
     supabase.from("transactions").select("entity_id, amount, direction, signed_amount, occurred_on").gte("occurred_on", since),
   ]);
 

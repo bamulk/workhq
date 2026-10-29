@@ -30,7 +30,7 @@ export default async function ActivityPage({
   const range = resolveRange(sp);
 
   const [{ data: entities }, { data: categories }] = await Promise.all([
-    supabase.from("entities").select("*").order("sort_order"),
+    supabase.from("entities").select("*").neq("type", "home").order("sort_order"),
     supabase.from("categories").select("*").order("sort_order"),
   ]);
 

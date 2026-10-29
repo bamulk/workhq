@@ -20,6 +20,7 @@ export default async function EntitiesPage() {
 
   const businesses = entities.filter((e) => e.type === "business" && !e.archived);
   const rentals = entities.filter((e) => e.type === "rental" && !e.archived);
+  const homes = entities.filter((e) => e.type === "home" && !e.archived);
   const archived = entities.filter((e) => e.archived);
 
   return (
@@ -54,6 +55,20 @@ export default async function EntitiesPage() {
           {rentals.length > 0 && (
             <Section title="Rental houses">
               <EntityRanking entities={rentals} byEntity={byEntity} />
+            </Section>
+          )}
+          {homes.length > 0 && (
+            <Section title="Primary home" aside="Equity only">
+              <ul className="divide-y divide-rule border-b border-rule">
+                {homes.map((e) => (
+                  <li key={e.id}>
+                    <Link href={`/entities/${e.id}`} className="block py-3 hover:bg-hover">
+                      <span className="block truncate">{e.name}</span>
+                      <span className="block text-[13px] text-ink-3 truncate">{e.address ?? "No address yet"}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </Section>
           )}
           {archived.length > 0 && (

@@ -5,9 +5,9 @@ import { ArrowDownLeft, ArrowUpRight, ChevronDown } from "lucide-react";
 import { Field, Input, Select, Textarea } from "@/components/ui";
 import SubmitButton from "@/components/SubmitButton";
 import { todayISO } from "@/lib/format";
-import type { Transaction, Category, Direction } from "@/lib/types";
+import type { Transaction, Category, Direction, EntityType } from "@/lib/types";
 
-type EntityOption = { id: string; name: string; type: "business" | "rental" };
+type EntityOption = { id: string; name: string; type: EntityType };
 type CategoryOption = Pick<Category, "id" | "name" | "kind" | "applies_to">;
 
 export default function TransactionForm({

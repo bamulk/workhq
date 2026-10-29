@@ -13,7 +13,7 @@ export default async function NewTransactionPage({
   const sp = await searchParams;
   const supabase = await createClient();
   const [{ data: entities }, { data: categories }] = await Promise.all([
-    supabase.from("entities").select("id, name, type").eq("archived", false).order("sort_order"),
+    supabase.from("entities").select("id, name, type").eq("archived", false).neq("type", "home").order("sort_order"),
     supabase.from("categories").select("id, name, kind, applies_to").order("sort_order"),
   ]);
 
