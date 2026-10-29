@@ -4,9 +4,11 @@ import { LinkButton, EmptyState, Section } from "@/components/ui";
 import KeyFigures from "@/components/KeyFigures";
 import EntityRanking from "@/components/EntityRanking";
 import PeriodTabs from "@/components/PeriodTabs";
+import EquityFigures from "@/components/EquityFigures";
+import { equityFor, latestValuations } from "@/lib/equity";
 import { resolveRange } from "@/lib/ranges";
 import { summarize, summarizeByEntity, type FlowRow } from "@/lib/aggregate";
-import type { Entity } from "@/lib/types";
+import type { Entity, HomeValuation, Mortgage } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -25,15 +27,28 @@ export default async function Overview({
   if (range.start) txnQuery = txnQuery.gte("occurred_on", range.start);
   if (range.end) txnQuery = txnQuery.lte("occurred_on", range.end);
 
-  const [{ data: entityRows }, { data: txnRows }] = await Promise.all([
+  const [{ data: entityRows }, { data: txnRows }, { data: valuationRows }, { data: mortgageRows }] = await Promise.all([
     supabase.from("entities").select("*").eq("archived", false).order("sort_order"),
     txnQuery,
+    supabase.from("home_valuations").select("*").order("fetched_at", { ascending: false }),
+    supabase.from("mortgages").select("*"),
   ]);
 
   const entities = (entityRows ?? []) as Entity[];
   const rows = (txnRows ?? []) as FlowRow[];
   const consolidated = summarize(rows);
   const byEntity = summarizeByEntity(rows);
+
+  // Rental equity: latest value per house minus estimated mortgage balances.
+  const rentals = entities.filter((e) => e.type === "rental");
+  const valuations = latestValuations((valuationRows ?? []) as HomeValuation[]);
+  const mortgages = (mortgageRows ?? []) as Mortgage[];
+  const perHouse = rentals.map((e) =>
+    equityFor(valuations.get(e.id), mortgages.filter((m) => m.entity_id === e.id))
+  );
+  const valued = perHouse.filter((h) => h.value != null);
+  const totalValue = valued.reduce((acc, h) => acc + (h.value ?? 0), 0);
+  const totalOwed = perHouse.reduce((acc, h) => acc + h.owed, 0);
 
   return (
     <div className="space-y-6">
@@ -66,6 +81,21 @@ export default async function Overview({
             </div>
           )}
           <EntityRanking entities={entities} byEntity={byEntity} />
+        </Section>
+      )}
+
+      {rentals.length > 0 && (
+        <Section title="Rental equity" aside={`${valued.length} of ${rentals.length} houses valued`}>
+          <EquityFigures
+            value={valued.length ? totalValue : null}
+            owed={totalOwed}
+            equity={valued.length ? totalValue - totalOwed : null}
+          />
+          {valued.length < rentals.length && (
+            <p className="text-[13px] text-ink-3 pt-2">
+              Open each rental under Entities to add its address and mortgage, then pull its value.
+            </p>
+          )}
         </Section>
       )}
     </div>

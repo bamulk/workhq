@@ -31,6 +31,8 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
   const isAuthRoute = pathname.startsWith("/login");
+  // Scheduled jobs carry their own secret instead of a session.
+  if (pathname.startsWith("/api/cron/")) return response;
 
   if (!user && !isAuthRoute) {
     const url = request.nextUrl.clone();
