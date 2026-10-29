@@ -27,13 +27,10 @@ export function formatSigned(n: number | null | undefined): string {
   return formatted;
 }
 
-/** Tailwind text-color class for a net amount (emerald positive, rose negative). */
+/** Tailwind text-color class for a net amount (gain green positive, loss red negative). */
 export function netTone(n: number | null | undefined): string {
-  if (n == null || Number.isNaN(n) || n === 0)
-    return "text-slate-900 dark:text-slate-100";
-  return n > 0
-    ? "text-emerald-600 dark:text-emerald-400"
-    : "text-rose-600 dark:text-rose-400";
+  if (n == null || Number.isNaN(n) || n === 0) return "text-ink";
+  return n > 0 ? "text-gain" : "text-loss";
 }
 
 /** Format a YYYY-MM-DD (or ISO) date without timezone drift. */

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
 import { Upload, CheckCircle2, AlertTriangle, Copy } from "lucide-react";
-import { Card, Field, Select, Button } from "@/components/ui";
+import { Field, Select, Button, Section, ErrorNote } from "@/components/ui";
 import { formatSigned } from "@/lib/format";
 import {
   IMPORT_FIELDS,
@@ -99,11 +99,10 @@ export default function ImportWizard({ entities }: { entities: EntityOption[] })
   const canPreview = entityId && rawRows.length > 0 && mapping.occurred_on && mapping.amount;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-8">
       {/* Step 1 — entity + file */}
-      <Card className="p-5 space-y-4">
-        <h2 className="font-medium">1 · Choose entity & file</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <Section title="Choose a file">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
           <Field label="Entity">
             <Select value={entityId} onChange={(e) => setEntityId(e.target.value)}>
               {entities.map((e) => (
@@ -116,21 +115,21 @@ export default function ImportWizard({ entities }: { entities: EntityOption[] })
               type="file"
               accept=".csv,text/csv"
               onChange={onFile}
-              className="block w-full text-sm text-slate-600 dark:text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-brand file:px-3 file:py-2 file:text-white file:text-sm hover:file:bg-brand-hover"
+              className="block w-full text-[14px] text-ink-2 file:mr-3 file:h-11 file:rounded-[4px] file:border-0 file:bg-ink file:px-4 file:text-paper file:text-[14px] file:font-semibold hover:file:bg-ink-2"
             />
           </Field>
         </div>
         {fileName && (
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-[13px] text-ink-3 pt-3">
             {fileName} · {rawRows.length} rows · {headers.length} columns
           </p>
         )}
-      </Card>
+      </Section>
 
       {/* Step 2 — mapping */}
       {headers.length > 0 && (
-        <Card className="p-5 space-y-4">
-          <h2 className="font-medium">2 · Map columns</h2>
+        <Section title="Match the columns">
+          <div className="space-y-4 pt-2">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {IMPORT_FIELDS.map((f) => (
               <Field key={f.key} label={`${f.label}${f.required ? " *" : ""}`} hint={f.hint}>
@@ -143,7 +142,7 @@ export default function ImportWizard({ entities }: { entities: EntityOption[] })
               </Field>
             ))}
           </div>
-          <Field label="How is direction (in vs out) determined?">
+          <Field label="How can we tell money in from money out?">
             <Select value={sign} onChange={(e) => setSign(e.target.value as SignConvention)}>
               {SIGN_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -152,74 +151,75 @@ export default function ImportWizard({ entities }: { entities: EntityOption[] })
           </Field>
           <div className="flex justify-end">
             <Button type="button" onClick={runPreview} disabled={!canPreview || busy}>
-              <Upload size={14} /> {busy ? "Working…" : "Preview"}
+              <Upload size={14} /> {busy ? "Checking…" : "Preview"}
             </Button>
           </div>
-        </Card>
+          </div>
+        </Section>
       )}
 
       {error && (
-        <p className="text-red-600 text-sm bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 rounded-lg px-3 py-2">
-          {error}
-        </p>
+        <ErrorNote>{error}</ErrorNote>
       )}
 
       {done && (
-        <Card className="p-5">
-          <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-medium">
+        <div role="status" className="border-y border-rule py-4">
+          <div className="flex items-center gap-2 text-gain font-semibold">
             <CheckCircle2 size={18} /> Imported {done.inserted} transaction{done.inserted === 1 ? "" : "s"}
           </div>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            {done.skipped > 0 ? `${done.skipped} row(s) skipped (duplicates or errors). ` : ""}
-            They now appear on the dashboard and transactions list.
+          <p className="text-ink-3 mt-1">
+            {done.skipped > 0 ? `${done.skipped} row${done.skipped === 1 ? "" : "s"} skipped as duplicates or errors. ` : ""}
+            They now show on the overview and in activity.
           </p>
-        </Card>
+        </div>
       )}
 
       {/* Step 3 — preview */}
       {preview && (
-        <Card className="p-5 space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <h2 className="font-medium">3 · Review &amp; confirm</h2>
-            <div className="flex items-center gap-3 text-xs">
-              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+        <Section
+          title="Check and import"
+          aside={
+            <span className="inline-flex items-center gap-3">
+              <span className="inline-flex items-center gap-1 text-gain">
                 <CheckCircle2 size={13} /> {preview.okCount} new
               </span>
-              <span className="inline-flex items-center gap-1 text-slate-500">
+              <span className="inline-flex items-center gap-1 text-ink-3">
                 <Copy size={13} /> {preview.duplicateCount} duplicate
               </span>
-              <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400">
+              <span className="inline-flex items-center gap-1 text-loss">
                 <AlertTriangle size={13} /> {preview.errorCount} error
               </span>
-            </div>
-          </div>
+            </span>
+          }
+        >
+          <div className="space-y-4 pt-2">
 
-          <div className="overflow-x-auto max-h-96 overflow-y-auto rounded-lg border border-slate-100 dark:border-slate-800">
-            <table className="w-full text-sm">
-              <thead className="text-left text-xs text-slate-500 dark:text-slate-400 sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+          <div className="overflow-x-auto max-h-96 overflow-y-auto border border-rule rounded-[4px]">
+            <table className="w-full text-[14px]">
+              <thead className="text-left text-[13px] text-ink-3 sticky top-0 bg-surface border-b border-rule">
                 <tr>
-                  <th className="p-2 font-medium">#</th>
-                  <th className="p-2 font-medium">Status</th>
-                  <th className="p-2 font-medium">Date</th>
-                  <th className="p-2 font-medium">Description</th>
-                  <th className="p-2 font-medium">Category</th>
-                  <th className="p-2 font-medium text-right">Amount</th>
+                  <th className="p-2">#</th>
+                  <th className="p-2">Status</th>
+                  <th className="p-2">Date</th>
+                  <th className="p-2">Description</th>
+                  <th className="p-2">Category</th>
+                  <th className="p-2 text-right">Amount</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
+              <tbody className="divide-y divide-rule">
                 {preview.rows.slice(0, 200).map((r) => (
-                  <tr key={r.index} className={r.status === "error" ? "bg-amber-50/50 dark:bg-amber-950/10" : ""}>
-                    <td className="p-2 text-slate-400">{r.index + 1}</td>
+                  <tr key={r.index} className={r.status === "error" ? "bg-hover" : ""}>
+                    <td className="p-2 text-ink-3">{r.index + 1}</td>
                     <td className="p-2">
-                      {r.status === "ok" && <span className="text-emerald-600 dark:text-emerald-400">New</span>}
-                      {r.status === "duplicate" && <span className="text-slate-400">Duplicate</span>}
+                      {r.status === "ok" && <span className="text-gain">New</span>}
+                      {r.status === "duplicate" && <span className="text-ink-3">Duplicate</span>}
                       {r.status === "error" && (
-                        <span className="text-amber-600 dark:text-amber-400" title={r.reason}>Error</span>
+                        <span className="text-loss" title={r.reason}>Error</span>
                       )}
                     </td>
                     <td className="p-2 whitespace-nowrap">{r.txn?.occurred_on ?? "—"}</td>
                     <td className="p-2">{r.txn?.description ?? r.reason ?? "—"}</td>
-                    <td className="p-2 text-slate-500 dark:text-slate-400">
+                    <td className="p-2 text-ink-3">
                       {r.txn?.category_label
                         ? `${r.txn.category_label}${r.txn.category_matched ? "" : " (?)"}`
                         : "—"}
@@ -235,7 +235,7 @@ export default function ImportWizard({ entities }: { entities: EntityOption[] })
             </table>
           </div>
           {preview.rows.length > 200 && (
-            <p className="text-xs text-slate-400">Showing first 200 of {preview.rows.length} rows.</p>
+            <p className="text-[13px] text-ink-3">Showing the first 200 of {preview.rows.length} rows.</p>
           )}
 
           <div className="flex justify-end gap-2">
@@ -246,7 +246,8 @@ export default function ImportWizard({ entities }: { entities: EntityOption[] })
               {busy ? "Importing…" : `Import ${preview.okCount} transaction${preview.okCount === 1 ? "" : "s"}`}
             </Button>
           </div>
-        </Card>
+          </div>
+        </Section>
       )}
     </div>
   );

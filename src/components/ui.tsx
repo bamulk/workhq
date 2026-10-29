@@ -1,27 +1,28 @@
 import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import type { ComponentProps, ComponentPropsWithoutRef, ReactNode } from "react";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md";
 
 const base =
-  "inline-flex items-center justify-center gap-2 font-medium rounded-lg select-none whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-brand disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center justify-center gap-2 font-semibold rounded-[4px] select-none whitespace-nowrap transition-colors duration-150 disabled:opacity-45 disabled:pointer-events-none";
 
 const variants: Record<Variant, string> = {
-  primary:
-    "bg-brand text-white hover:bg-brand-hover shadow-sm shadow-slate-900/20",
-  secondary:
-    "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-sm",
-  ghost:
-    "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800",
-  danger:
-    "bg-white dark:bg-slate-900 text-red-600 border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-950/30",
+  primary: "bg-ink text-paper hover:bg-ink-2",
+  secondary: "bg-surface text-ink border border-rule hover:border-ink",
+  ghost: "text-ink-2 hover:text-ink hover:bg-hover",
+  danger: "bg-surface text-loss border border-rule hover:border-loss",
 };
 
 const sizes: Record<Size, string> = {
-  sm: "text-xs px-2.5 py-1.5",
-  md: "text-sm px-3.5 py-2",
+  sm: "text-[13px] h-9 px-3",
+  md: "text-[15px] h-11 px-4",
 };
+
+export function buttonClass(variant: Variant = "primary", size: Size = "md", className = "") {
+  return `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+}
 
 export function Button({
   variant = "primary",
@@ -29,12 +30,7 @@ export function Button({
   className = "",
   ...props
 }: ComponentPropsWithoutRef<"button"> & { variant?: Variant; size?: Size }) {
-  return (
-    <button
-      {...props}
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
-    />
-  );
+  return <button {...props} className={buttonClass(variant, size, className)} />;
 }
 
 export function LinkButton({
@@ -51,15 +47,13 @@ export function LinkButton({
   children: ReactNode;
 }) {
   return (
-    <Link
-      href={href}
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
-    >
+    <Link href={href} className={buttonClass(variant, size, className)}>
       {children}
     </Link>
   );
 }
 
+/** A plain ruled box — used for forms. Lists and figures sit on the page without one. */
 export function Card({
   className = "",
   children,
@@ -67,45 +61,71 @@ export function Card({
   className?: string;
   children: ReactNode;
 }) {
-  return (
-    <div
-      className={`bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700/70 shadow-sm shadow-slate-900/[0.02] ${className}`}
-    >
-      {children}
-    </div>
-  );
+  return <div className={`bg-surface border border-rule rounded-[4px] ${className}`}>{children}</div>;
 }
 
 export function PageHeader({
   title,
   subtitle,
   actions,
+  back,
 }: {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  back?: { href: string; label: string };
 }) {
   return (
-    <div className="flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        {subtitle && (
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">
-            {subtitle}
-          </p>
-        )}
-      </div>
-      {actions && (
-        <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 w-full sm:w-auto">
-          {actions}
+    <div className="space-y-3">
+      {back && <BackLink href={back.href}>{back.label}</BackLink>}
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div className="min-w-0">
+          <h1 className="text-[28px] leading-tight font-semibold tracking-[-0.02em] text-balance">{title}</h1>
+          {subtitle && <p className="text-ink-3 mt-1">{subtitle}</p>}
         </div>
-      )}
+        {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+      </div>
     </div>
   );
 }
 
+export function BackLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center gap-1 -ml-1 h-8 pr-2 text-[13px] text-ink-2 hover:text-ink"
+    >
+      <ChevronLeft size={16} strokeWidth={2} />
+      {children}
+    </Link>
+  );
+}
+
+/** Section title sitting on a strong top rule — the report's way of dividing a page. */
+export function Section({
+  title,
+  aside,
+  children,
+  className = "",
+}: {
+  title: string;
+  aside?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={`space-y-1 ${className}`}>
+      <div className="flex items-baseline justify-between gap-4 border-t-2 border-rule-strong pt-3 pb-1">
+        <h2 className="text-[17px] font-semibold tracking-[-0.01em]">{title}</h2>
+        {aside && <div className="text-[13px] text-ink-3">{aside}</div>}
+      </div>
+      {children}
+    </section>
+  );
+}
+
 const inputClass =
-  "w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100";
+  "w-full h-11 border border-rule rounded-[4px] px-3 text-base sm:text-[15px] text-ink transition-colors duration-150 hover:border-ink-3";
 
 export function Input(props: ComponentProps<"input">) {
   return <input {...props} className={`${inputClass} ${props.className ?? ""}`} />;
@@ -113,12 +133,15 @@ export function Input(props: ComponentProps<"input">) {
 
 export function Textarea(props: ComponentProps<"textarea">) {
   return (
-    <textarea {...props} className={`${inputClass} ${props.className ?? ""}`} />
+    <textarea
+      {...props}
+      className={`${inputClass} h-auto py-2.5 ${props.className ?? ""}`}
+    />
   );
 }
 
 export function Select(props: ComponentProps<"select">) {
-  return <select {...props} className={`${inputClass} ${props.className ?? ""}`} />;
+  return <select {...props} className={`${inputClass} pr-8 ${props.className ?? ""}`} />;
 }
 
 export function Field({
@@ -131,43 +154,26 @@ export function Field({
   hint?: string;
 }) {
   return (
-    <label className="block space-y-1">
-      <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-        {label}
-      </span>
+    <label className="block space-y-1.5">
+      <span className="block text-[13px] text-ink-2">{label}</span>
       {children}
-      {hint && (
-        <span className="block text-xs text-slate-400 dark:text-slate-500">
-          {hint}
-        </span>
-      )}
+      {hint && <span className="block text-[13px] text-ink-3">{hint}</span>}
     </label>
   );
 }
 
-const badgeColors: Record<string, string> = {
-  // generic statuses
-  planned: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 ring-slate-200 dark:ring-slate-700",
-  in_progress: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 ring-amber-200 dark:ring-amber-900",
-  done: "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-200 dark:ring-emerald-900",
-  overdue: "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 ring-rose-200 dark:ring-rose-900",
-  // cash flow
-  in: "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-200 dark:ring-emerald-900",
-  out: "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 ring-rose-200 dark:ring-rose-900",
-  income: "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-200 dark:ring-emerald-900",
-  expense: "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 ring-rose-200 dark:ring-rose-900",
-  // entity types
-  business: "bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-300 ring-violet-200 dark:ring-violet-900",
-  rental: "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 ring-sky-200 dark:ring-sky-900",
-  // import batch statuses
-  committed: "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 ring-emerald-200 dark:ring-emerald-900",
-  preview: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 ring-amber-200 dark:ring-amber-900",
-  reverted: "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 ring-slate-200 dark:ring-slate-700",
+const badgeTones: Record<string, string> = {
+  in: "text-gain",
+  out: "text-loss",
+  committed: "text-gain",
+  reverted: "text-ink-3",
+  preview: "text-ink-2",
 };
 
+/** A quiet printed label: small text in a hairline box. Colour only when it carries meaning. */
 export function Badge({
   children,
-  tone = "planned",
+  tone = "",
   className = "",
 }: {
   children: ReactNode;
@@ -176,8 +182,8 @@ export function Badge({
 }) {
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset ${
-        badgeColors[tone] ?? badgeColors.planned
+      className={`inline-flex items-center h-5 px-1.5 rounded-[3px] border border-rule text-[12px] ${
+        badgeTones[tone] ?? "text-ink-2"
       } ${className}`}
     >
       {children}
@@ -195,14 +201,18 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="text-center py-16 px-4">
-      <p className="text-slate-900 dark:text-slate-100 font-medium">{title}</p>
-      {description && (
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
-          {description}
-        </p>
-      )}
-      {action && <div className="mt-4 flex justify-center">{action}</div>}
+    <div className="py-12 px-4 text-center border-y border-rule">
+      <p className="font-semibold">{title}</p>
+      {description && <p className="text-ink-3 mt-1 max-w-sm mx-auto text-pretty">{description}</p>}
+      {action && <div className="mt-5 flex justify-center">{action}</div>}
     </div>
+  );
+}
+
+export function ErrorNote({ children }: { children: ReactNode }) {
+  return (
+    <p role="alert" className="text-[14px] text-loss border border-loss/40 rounded-[4px] px-3 py-2.5">
+      {children}
+    </p>
   );
 }

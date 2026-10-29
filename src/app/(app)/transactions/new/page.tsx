@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader, EmptyState, LinkButton } from "@/components/ui";
 import TransactionForm from "@/components/TransactionForm";
@@ -20,16 +19,11 @@ export default async function NewTransactionPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/transactions" className="text-sm text-slate-600 dark:text-slate-400 hover:underline">
-          ← All transactions
-        </Link>
-      </div>
-      <PageHeader title="New transaction" />
+      <PageHeader title="Add transaction" />
       {(entities ?? []).length === 0 ? (
         <EmptyState
-          title="Add an entity first"
-          description="You need at least one business or rental house before recording money."
+          title="Add a business or rental first"
+          description="Money has to belong to something before you can record it."
           action={<LinkButton href="/entities/new">New entity</LinkButton>}
         />
       ) : (

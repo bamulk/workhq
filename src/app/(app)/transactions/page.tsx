@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Plus, Filter } from "lucide-react";
+import { Plus, SlidersHorizontal } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { PageHeader, LinkButton, Card, Badge, EmptyState, Select, Input, Button } from "@/components/ui";
-import MoneyFlowCards from "@/components/MoneyFlowCards";
-import { formatDate, formatSigned, netTone } from "@/lib/format";
+import { PageHeader, LinkButton, EmptyState, Select, Field, Button, Section } from "@/components/ui";
+import KeyFigures from "@/components/KeyFigures";
+import PeriodTabs from "@/components/PeriodTabs";
+import TransactionList from "@/components/TransactionList";
 import { resolveRange } from "@/lib/ranges";
 import { summarize, type FlowRow } from "@/lib/aggregate";
 import type { Entity, Category, TransactionWithJoins } from "@/lib/types";
@@ -19,7 +20,7 @@ type SP = {
   to?: string;
 };
 
-export default async function TransactionsPage({
+export default async function ActivityPage({
   searchParams,
 }: {
   searchParams: Promise<SP>;
@@ -51,123 +52,84 @@ export default async function TransactionsPage({
 
   const entityList = (entities ?? []) as Entity[];
   const categoryList = (categories ?? []) as Category[];
+  const activeFilters = [sp.entity, sp.category, sp.direction].filter(Boolean).length;
+  const entityName = entityList.find((e) => e.id === sp.entity)?.name;
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Transactions"
-        subtitle={`${rows.length} in ${range.label}`}
+        title="Activity"
         actions={
-          <LinkButton href="/transactions/new">
-            <Plus size={14} /> New transaction
-          </LinkButton>
+          <span className="hidden md:block">
+            <LinkButton href="/transactions/new">
+              <Plus size={16} /> Add transaction
+            </LinkButton>
+          </span>
         }
       />
 
+      <PeriodTabs
+        current={range.key}
+        from={sp.from}
+        to={sp.to}
+        basePath="/transactions"
+        keep={{ entity: sp.entity, category: sp.category, direction: sp.direction }}
+      />
+
       {/* Filters — plain GET form, works without JS */}
-      <Card className="p-4">
-        <form className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 items-end">
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Entity</span>
+      <details open={activeFilters > 0}>
+        <summary className="inline-flex items-center gap-2 h-9 px-3 rounded-[4px] border border-rule bg-surface text-[13px] font-semibold hover:border-ink">
+          <SlidersHorizontal size={14} />
+          Filter{activeFilters > 0 ? ` · ${activeFilters} on` : ""}
+        </summary>
+        <form className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+          {sp.range && <input type="hidden" name="range" value={sp.range} />}
+          {sp.from && <input type="hidden" name="from" value={sp.from} />}
+          {sp.to && <input type="hidden" name="to" value={sp.to} />}
+          <Field label="Entity">
             <Select name="entity" defaultValue={sp.entity ?? ""}>
-              <option value="">All</option>
+              <option value="">All entities</option>
               {entityList.map((e) => (
                 <option key={e.id} value={e.id}>{e.name}</option>
               ))}
             </Select>
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Direction</span>
+          </Field>
+          <Field label="Direction">
             <Select name="direction" defaultValue={sp.direction ?? ""}>
-              <option value="">All</option>
+              <option value="">In and out</option>
               <option value="in">Money in</option>
               <option value="out">Money out</option>
             </Select>
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Category</span>
+          </Field>
+          <Field label="Category">
             <Select name="category" defaultValue={sp.category ?? ""}>
-              <option value="">All</option>
+              <option value="">All categories</option>
               {categoryList.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </Select>
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Range</span>
-            <Select name="range" defaultValue={sp.range ?? "month"}>
-              <option value="month">This month</option>
-              <option value="ytd">Year to date</option>
-              <option value="last12">Last 12 months</option>
-              <option value="all">All time</option>
-              <option value="custom">Custom</option>
-            </Select>
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">From</span>
-            <Input type="date" name="from" defaultValue={sp.from ?? ""} />
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">To</span>
-            <Input type="date" name="to" defaultValue={sp.to ?? ""} />
-          </label>
-          <div className="col-span-2 sm:col-span-3 lg:col-span-6 flex justify-end gap-2">
-            <Link href="/transactions" className="text-sm text-slate-500 hover:underline self-center">Reset</Link>
-            <Button type="submit" size="sm">
-              <Filter size={14} /> Apply
-            </Button>
+          </Field>
+          <div className="sm:col-span-3 flex justify-end gap-2">
+            <Link href="/transactions" className="inline-flex items-center h-9 px-3 text-[13px] font-semibold text-ink-2 hover:text-ink">
+              Clear
+            </Link>
+            <Button type="submit" size="sm">Apply</Button>
           </div>
         </form>
-      </Card>
+      </details>
 
-      <MoneyFlowCards summary={summary} label={range.label} />
+      <KeyFigures summary={summary} label={entityName ? `${entityName}, ${range.label}` : range.label} />
 
       {rows.length === 0 ? (
         <EmptyState
           title="No transactions"
-          description="Nothing matches these filters. Add one or widen the date range."
-          action={<LinkButton href="/transactions/new"><Plus size={14} /> New transaction</LinkButton>}
+          description={activeFilters > 0 ? "Nothing matches these filters. Clear them or pick a longer period." : `Nothing recorded for this period yet.`}
+          action={<LinkButton href="/transactions/new"><Plus size={16} /> Add transaction</LinkButton>}
         />
       ) : (
-        <Card className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
-              <tr>
-                <th className="p-3 font-medium">Date</th>
-                <th className="p-3 font-medium">Entity</th>
-                <th className="p-3 font-medium">Description</th>
-                <th className="p-3 font-medium">Category</th>
-                <th className="p-3 font-medium text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
-              {rows.map((t) => (
-                <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="p-3 whitespace-nowrap text-slate-500 dark:text-slate-400">
-                    {formatDate(t.occurred_on)}
-                  </td>
-                  <td className="p-3">
-                    {t.entities ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        <Badge tone={t.entities.type}>{t.entities.type === "business" ? "biz" : "rental"}</Badge>
-                        <span className="truncate max-w-[140px]">{t.entities.name}</span>
-                      </span>
-                    ) : "—"}
-                  </td>
-                  <td className="p-3">
-                    <Link href={`/transactions/${t.id}`} className="hover:underline">
-                      {t.description || t.counterparty || "—"}
-                    </Link>
-                  </td>
-                  <td className="p-3 text-slate-500 dark:text-slate-400">{t.categories?.name ?? "—"}</td>
-                  <td className={`p-3 text-right whitespace-nowrap font-medium ${netTone(t.signed_amount)}`}>
-                    {formatSigned(t.signed_amount)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+        <Section title="Transactions" aside={`${rows.length}${rows.length === 500 ? "+" : ""}`}>
+          <TransactionList rows={rows} />
+        </Section>
       )}
     </div>
   );

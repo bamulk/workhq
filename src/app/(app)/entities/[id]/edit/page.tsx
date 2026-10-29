@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/ui";
@@ -22,12 +21,7 @@ export default async function EditEntityPage({
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href={`/entities/${id}`} className="text-sm text-slate-600 dark:text-slate-400 hover:underline">
-          ← Back to {entity.name}
-        </Link>
-      </div>
-      <PageHeader title={`Edit ${entity.name}`} />
+      <PageHeader title={`Edit ${entity.name}`} back={{ href: `/entities/${id}`, label: entity.name }} />
       <EntityForm action={updateAction} entity={entity} submitLabel="Save changes" />
     </div>
   );

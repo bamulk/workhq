@@ -1,35 +1,43 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Plus, Pencil, Archive, ArchiveRestore } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { PageHeader, Card, Badge, LinkButton, Button } from "@/components/ui";
+import { PageHeader, LinkButton, Button, Section, EmptyState } from "@/components/ui";
 import DeleteButton from "@/components/DeleteButton";
-import MoneyFlowCards from "@/components/MoneyFlowCards";
-import { formatCurrency, formatDate, formatSigned, netTone, titleize } from "@/lib/format";
+import KeyFigures from "@/components/KeyFigures";
+import PeriodTabs from "@/components/PeriodTabs";
+import TransactionList from "@/components/TransactionList";
+import { titleize } from "@/lib/format";
+import { resolveRange } from "@/lib/ranges";
 import { summarize, type FlowRow } from "@/lib/aggregate";
-import {
-  setEntityArchivedAction,
-  deleteEntityAction,
-} from "../actions";
+import { setEntityArchivedAction, deleteEntityAction } from "../actions";
 import type { Entity, TransactionWithJoins } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function EntityDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ range?: string; from?: string; to?: string }>;
 }) {
   const { id } = await params;
+  const sp = await searchParams;
+  const range = resolveRange(sp);
   const supabase = await createClient();
+
+  let txnQuery = supabase
+    .from("transactions")
+    .select("*, entities(name, type), categories(name, kind)")
+    .eq("entity_id", id)
+    .order("occurred_on", { ascending: false })
+    .limit(200);
+  if (range.start) txnQuery = txnQuery.gte("occurred_on", range.start);
+  if (range.end) txnQuery = txnQuery.lte("occurred_on", range.end);
+
   const [{ data: entityRow }, { data: txnRows }] = await Promise.all([
     supabase.from("entities").select("*").eq("id", id).single(),
-    supabase
-      .from("transactions")
-      .select("*, entities(name, type), categories(name, kind)")
-      .eq("entity_id", id)
-      .order("occurred_on", { ascending: false })
-      .limit(100),
+    txnQuery,
   ]);
   if (!entityRow) notFound();
   const entity = entityRow as Entity;
@@ -38,97 +46,55 @@ export default async function EntityDetailPage({
 
   const archiveAction = setEntityArchivedAction.bind(null, id, !entity.archived);
   const deleteAction = deleteEntityAction.bind(null, id);
+  const subtitle = [
+    entity.type === "rental" ? "Rental house" : "Business",
+    entity.subtype ? titleize(entity.subtype) : null,
+    entity.address,
+    entity.archived ? "Archived" : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/entities" className="text-sm text-slate-600 dark:text-slate-400 hover:underline">
-          ← All entities
-        </Link>
-      </div>
-
       <PageHeader
         title={entity.name}
-        subtitle={[titleize(entity.subtype) !== "—" ? titleize(entity.subtype) : null, entity.address]
-          .filter(Boolean)
-          .join(" · ") || undefined}
+        subtitle={subtitle}
+        back={{ href: "/entities", label: "Entities" }}
         actions={
           <>
-            <LinkButton href={`/transactions/new?entity=${entity.id}`} variant="secondary">
-              <Plus size={14} /> Add transaction
+            <LinkButton href={`/transactions/new?entity=${entity.id}`} size="sm">
+              <Plus size={14} /> Add
             </LinkButton>
-            <LinkButton href={`/entities/${id}/edit`} variant="secondary">
+            <LinkButton href={`/entities/${id}/edit`} variant="secondary" size="sm">
               <Pencil size={14} /> Edit
             </LinkButton>
           </>
         }
       />
 
-      <div className="flex items-center gap-2">
-        <Badge tone={entity.type}>{entity.type}</Badge>
-        {entity.archived && <Badge tone="reverted">archived</Badge>}
-      </div>
+      <PeriodTabs current={range.key} from={sp.from} to={sp.to} basePath={`/entities/${id}`} />
 
-      <MoneyFlowCards summary={summary} label="All time" />
+      <KeyFigures summary={summary} label={range.label} />
 
-      <Card className="overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-          <h2 className="font-medium">Transactions</h2>
-          <span className="text-xs text-slate-400">{txns.length} shown</span>
-        </div>
-        {txns.length === 0 ? (
-          <div className="p-8 text-center text-sm text-slate-400">
-            No transactions yet.{" "}
-            <Link href={`/transactions/new?entity=${entity.id}`} className="text-brand hover:underline">
-              Add one
-            </Link>
-            .
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
-              <tr>
-                <th className="p-3 font-medium">Date</th>
-                <th className="p-3 font-medium">Description</th>
-                <th className="p-3 font-medium">Category</th>
-                <th className="p-3 font-medium text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60">
-              {txns.map((t) => (
-                <tr key={t.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                  <td className="p-3 whitespace-nowrap text-slate-500 dark:text-slate-400">
-                    {formatDate(t.occurred_on)}
-                  </td>
-                  <td className="p-3">
-                    <Link href={`/transactions/${t.id}`} className="hover:underline">
-                      {t.description || t.counterparty || "—"}
-                    </Link>
-                  </td>
-                  <td className="p-3 text-slate-500 dark:text-slate-400">
-                    {t.categories?.name ?? "—"}
-                  </td>
-                  <td className={`p-3 text-right whitespace-nowrap font-medium ${netTone(t.signed_amount)}`}>
-                    {formatSigned(t.signed_amount)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
+      {txns.length === 0 ? (
+        <EmptyState
+          title="Nothing recorded"
+          description={`No money in or out for ${entity.name} in this period.`}
+          action={
+            <LinkButton href={`/transactions/new?entity=${entity.id}`}>
+              <Plus size={16} /> Add transaction
+            </LinkButton>
+          }
+        />
+      ) : (
+        <Section title="Transactions" aside={`${txns.length}${txns.length === 200 ? "+" : ""}`}>
+          <TransactionList rows={txns} showEntity={false} />
+        </Section>
+      )}
 
-      <Card className="p-4 flex items-center justify-between gap-4 flex-wrap">
-        <div className="text-sm text-slate-500 dark:text-slate-400">
-          Net to date:{" "}
-          <span className={`font-semibold ${netTone(summary.net)}`}>
-            {formatSigned(summary.net)}
-          </span>{" "}
-          <span className="text-xs">
-            ({formatCurrency(summary.moneyIn)} in · {formatCurrency(summary.moneyOut)} out)
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
+      <Section title="Manage" className="pt-4">
+        <div className="flex flex-wrap items-center gap-2 pt-2">
           <form action={archiveAction}>
             <Button type="submit" variant="secondary" size="sm">
               {entity.archived ? (
@@ -144,11 +110,14 @@ export default async function EntityDetailPage({
           </form>
           <DeleteButton
             action={deleteAction}
-            label="Delete entity"
-            confirmText={`Delete ${entity.name} and ALL its transactions? This cannot be undone.`}
+            label="Delete"
+            confirmText={`Delete ${entity.name} and all of its transactions? This can't be undone.`}
           />
         </div>
-      </Card>
+        <p className="text-[13px] text-ink-3 pt-2">
+          Archiving hides it from the overview but keeps its history.
+        </p>
+      </Section>
     </div>
   );
 }

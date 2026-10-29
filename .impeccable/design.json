@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-29T13:10:00Z",
+  "title": "Design System: Finances",
+  "extensions": {
+    "colorMeta": {
+      "plate": { "role": "primary", "displayName": "Chrome Yellow Plate", "canonical": "#ffd23f", "tonalRamp": ["oklch(15% 0.03 92)", "oklch(25% 0.05 92)", "oklch(35% 0.07 92)", "oklch(45% 0.09 92)", "oklch(58% 0.12 92)", "oklch(72% 0.15 92)", "oklch(88% 0.17 92)", "oklch(96% 0.06 92)"] },
+      "plate-ink-2": { "role": "primary", "displayName": "Plate Umber", "canonical": "#4a3f12", "tonalRamp": ["oklch(15% 0.04 92)", "oklch(25% 0.05 92)", "oklch(35% 0.06 92)", "oklch(45% 0.07 92)", "oklch(55% 0.08 92)", "oklch(70% 0.08 92)", "oklch(85% 0.06 92)", "oklch(95% 0.03 92)"] },
+      "gain": { "role": "secondary", "displayName": "Ledger Green", "canonical": "#0b7a3e", "tonalRamp": ["oklch(15% 0.05 152)", "oklch(25% 0.08 152)", "oklch(35% 0.1 152)", "oklch(45% 0.12 152)", "oklch(52% 0.13 152)", "oklch(70% 0.15 152)", "oklch(85% 0.09 152)", "oklch(95% 0.04 152)"] },
+      "gain-bar": { "role": "secondary", "displayName": "Ledger Green (bar)", "canonical": "#0b7a3e" },
+      "loss": { "role": "secondary", "displayName": "Ledger Red", "canonical": "#c8231b", "tonalRamp": ["oklch(15% 0.06 28)", "oklch(25% 0.1 28)", "oklch(35% 0.14 28)", "oklch(45% 0.18 28)", "oklch(53% 0.2 28)", "oklch(70% 0.15 28)", "oklch(85% 0.08 28)", "oklch(95% 0.03 28)"] },
+      "loss-bar": { "role": "secondary", "displayName": "Ledger Red (bar)", "canonical": "#d7261e" },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "#f7f7f4", "tonalRamp": ["oklch(15% 0.005 106)", "oklch(25% 0.005 106)", "oklch(35% 0.005 106)", "oklch(45% 0.005 106)", "oklch(55% 0.005 106)", "oklch(70% 0.005 106)", "oklch(85% 0.005 106)", "oklch(97.5% 0.005 106)"] },
+      "surface": { "role": "neutral", "displayName": "Sheet White", "canonical": "#ffffff" },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#111312", "tonalRamp": ["oklch(15% 0.004 160)", "oklch(25% 0.004 160)", "oklch(35% 0.005 160)", "oklch(45% 0.006 160)", "oklch(55% 0.006 160)", "oklch(70% 0.006 160)", "oklch(85% 0.005 160)", "oklch(95% 0.003 160)"] },
+      "ink-2": { "role": "neutral", "displayName": "Graphite", "canonical": "#464a47" },
+      "ink-3": { "role": "neutral", "displayName": "Pencil", "canonical": "#676c68" },
+      "rule": { "role": "neutral", "displayName": "Hairline", "canonical": "#d9dad5" },
+      "rule-strong": { "role": "neutral", "displayName": "Strong Rule (ink)", "canonical": "#111312" },
+      "hover": { "role": "neutral", "displayName": "Press", "canonical": "#efefea" },
+      "plate-ink": { "role": "primary", "displayName": "Plate Ink", "canonical": "#111312" },
+      "paper-dark": { "role": "neutral", "displayName": "Paper (dark)", "canonical": "#0e100f" },
+      "surface-dark": { "role": "neutral", "displayName": "Sheet (dark)", "canonical": "#161917" },
+      "ink-dark": { "role": "neutral", "displayName": "Ink (dark)", "canonical": "#f2f2ee" },
+      "ink-2-dark": { "role": "neutral", "displayName": "Graphite (dark)", "canonical": "#bdc0ba" },
+      "ink-3-dark": { "role": "neutral", "displayName": "Pencil (dark)", "canonical": "#959a93" },
+      "rule-dark": { "role": "neutral", "displayName": "Hairline (dark)", "canonical": "#2b2f2c" },
+      "hover-dark": { "role": "neutral", "displayName": "Press (dark)", "canonical": "#1d211e" },
+      "gain-dark": { "role": "secondary", "displayName": "Ledger Green (dark)", "canonical": "#4cc785" },
+      "loss-dark": { "role": "secondary", "displayName": "Ledger Red (dark)", "canonical": "#ff7a6e" },
+      "gain-bar-dark": { "role": "secondary", "displayName": "Ledger Green bar (dark)", "canonical": "#3fb877" },
+      "loss-bar-dark": { "role": "secondary", "displayName": "Ledger Red bar (dark)", "canonical": "#f0574b" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display Figure", "purpose": "The net figure on the plate only; steps to 44px on phones when the formatted figure exceeds 10 characters." },
+      "headline": { "displayName": "Headline", "purpose": "Page titles, sign-in title, the amount input on the transaction form." },
+      "title": { "displayName": "Title", "purpose": "Section titles, wordmark, money in / money out sub-figures on the plate." },
+      "body": { "displayName": "Body", "purpose": "Row names, form values, prose. Inputs go to 16px on phones." },
+      "body-sm": { "displayName": "Body Small", "purpose": "Period tabs, desktop nav, report tables, error notes." },
+      "label": { "displayName": "Label", "purpose": "Field labels, row meta lines, plate labels, section asides, small buttons." },
+      "caption": { "displayName": "Caption", "purpose": "Badges and the chart's +/- max scale; phone tab bar labels use 11px." }
+    },
+    "shadows": [],
+    "strokes": [
+      { "name": "rule-hairline", "value": "1px solid var(--rule)", "purpose": "Every divider and container border." },
+      { "name": "rule-section", "value": "2px solid var(--rule-strong)", "purpose": "Opens a section; closes a table's total row." },
+      { "name": "tab-mark", "value": "3px solid var(--ink)", "purpose": "Active period tab, desktop nav item, phone tab-bar item." },
+      { "name": "focus-outline", "value": "outline: 2px solid var(--ink); outline-offset: 2px", "purpose": "Global :focus-visible." },
+      { "name": "input-focus", "value": "border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink)", "purpose": "Thickens the input border on focus; a stroke, not elevation." }
+    ],
+    "motion": [
+      { "name": "colour-transition", "value": "150ms (Tailwind default ease)", "purpose": "Hover and active colour changes on buttons, tabs, inputs." },
+      { "name": "bar-grow", "value": "420ms cubic-bezier(0.16, 1, 0.3, 1), scaleX from 0 at the axis", "purpose": "Entity Ranking bars, only under prefers-reduced-motion: no-preference." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px", "purpose": "Gutter 16 to 24px; Entity Ranking becomes a four-column grid." },
+      { "name": "md", "value": "768px", "purpose": "Phone tab bar gives way to inline top-bar nav and Add button." },
+      { "name": "container", "value": "1024px", "purpose": "max-w-5xl page measure." }
+    ],
+    "darkMode": "prefers-color-scheme: dark swaps paper/ink/rule/money tokens; plate, plate-ink and plate-ink-2 are unchanged."
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink block for the main action on a screen.",
+      "html": "<button class=\"ds-btn-primary\">Save transaction</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 16px; background: var(--ink, #111312); color: var(--paper, #f7f7f4); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; transition: background-color 150ms; } .ds-btn-primary:hover { background: var(--ink-2, #464a47); } .ds-btn-primary:focus-visible { outline: 2px solid var(--ink, #111312); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.45; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Sheet-white button on a hairline; border goes ink on hover.",
+      "html": "<button class=\"ds-btn-secondary\">Import CSV</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 16px; background: var(--surface, #ffffff); color: var(--ink, #111312); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 600; border: 1px solid var(--rule, #d9dad5); border-radius: 4px; cursor: pointer; transition: border-color 150ms; } .ds-btn-secondary:hover { border-color: var(--ink, #111312); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--ink, #111312); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet graphite text action with a Press wash on hover.",
+      "html": "<button class=\"ds-btn-ghost\">Sign out</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; height: 44px; padding: 0 16px; background: transparent; color: var(--ink-2, #464a47); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 600; border: none; border-radius: 4px; cursor: pointer; transition: color 150ms, background-color 150ms; } .ds-btn-ghost:hover { color: var(--ink, #111312); background: var(--hover, #efefea); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--ink, #111312); outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Destructive action: loss-red text on a hairline.",
+      "html": "<button class=\"ds-btn-danger\">Delete</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; height: 44px; padding: 0 16px; background: var(--surface, #ffffff); color: var(--loss, #c8231b); font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 600; border: 1px solid var(--rule, #d9dad5); border-radius: 4px; cursor: pointer; transition: border-color 150ms; } .ds-btn-danger:hover { border-color: var(--loss, #c8231b); } .ds-btn-danger:focus-visible { outline: 2px solid var(--ink, #111312); outline-offset: 2px; }"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "13px graphite label over a 44px hairline input; focus thickens the border to ink.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Amount</span><input class=\"ds-input\" placeholder=\"0.00\"></label>",
+      "css": ".ds-field { display: block; font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-field-label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--ink-2, #464a47); } .ds-input { width: 100%; height: 44px; padding: 0 12px; background: var(--surface, #ffffff); color: var(--ink, #111312); font: inherit; font-size: 15px; border: 1px solid var(--rule, #d9dad5); border-radius: 4px; transition: border-color 150ms; } .ds-input::placeholder { color: var(--ink-3, #676c68); } .ds-input:hover { border-color: var(--ink-3, #676c68); } .ds-input:focus { outline: none; border-color: var(--ink, #111312); box-shadow: inset 0 0 0 1px var(--ink, #111312); }"
+    },
+    {
+      "name": "Period Tabs",
+      "kind": "nav",
+      "refersTo": "period-tab",
+      "description": "Ruled row of tabs; active tab is 600 ink with a 3px ink bar on the rule.",
+      "html": "<nav class=\"ds-tabs\"><a class=\"ds-tab is-active\" href=\"#\">This month</a><a class=\"ds-tab\" href=\"#\">This year</a><a class=\"ds-tab\" href=\"#\">12 months</a><a class=\"ds-tab\" href=\"#\">All time</a><a class=\"ds-tab\" href=\"#\">Custom</a></nav>",
+      "css": ".ds-tabs { display: flex; border-bottom: 1px solid var(--rule, #d9dad5); font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-tab { position: relative; display: inline-flex; align-items: center; height: 44px; padding: 0 12px; font-size: 14px; color: var(--ink-3, #676c68); text-decoration: none; white-space: nowrap; transition: color 150ms; } .ds-tab:hover { color: var(--ink, #111312); } .ds-tab:focus-visible { outline: 2px solid var(--ink, #111312); outline-offset: 2px; } .ds-tab.is-active { color: var(--ink, #111312); font-weight: 600; } .ds-tab.is-active::after { content: \"\"; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 3px; background: var(--ink, #111312); }"
+    },
+    {
+      "name": "Phone Tab Bar",
+      "kind": "nav",
+      "refersTo": "tab-bar-item",
+      "description": "Five-slot bottom bar under md: Overview, Activity, Add (ink block), Entities, More; active slot carries a 3px ink bar on the top rule.",
+      "html": "<nav class=\"ds-tabbar\"><a class=\"ds-tabbar-item is-active\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg>Overview</a><a class=\"ds-tabbar-item\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\"><path d=\"M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13\"/></svg>Activity</a><a class=\"ds-tabbar-item\" href=\"#\"><span class=\"ds-tabbar-add\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"round\"><path d=\"M5 12h14M12 5v14\"/></svg></span>Add</a><a class=\"ds-tabbar-item\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z\"/><path d=\"M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2M10 6h4M10 10h4M10 14h4M10 18h4\"/></svg>Entities</a><a class=\"ds-tabbar-item\" href=\"#\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\"><path d=\"M4 12h16M4 6h16M4 18h16\"/></svg>More</a></nav>",
+      "css": ".ds-tabbar { display: grid; grid-template-columns: repeat(5, 1fr); background: var(--paper, #f7f7f4); border-top: 1px solid var(--rule, #d9dad5); font-family: Geist, ui-sans-serif, system-ui, sans-serif; } .ds-tabbar-item { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; height: 64px; font-size: 11px; color: var(--ink-3, #676c68); text-decoration: none; } .ds-tabbar-item svg { height: 28px; } .ds-tabbar-item:hover { color: var(--ink, #111312); } .ds-tabbar-item:focus-visible { outline: 2px solid var(--ink, #111312); outline-offset: -2px; } .ds-tabbar-item.is-active { color: var(--ink, #111312); } .ds-tabbar-item.is-active::before { content: \"\"; position: absolute; top: -1px; left: 16px; right: 16px; height: 3px; background: var(--ink, #111312); } .ds-tabbar-add { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 28px; border-radius: 4px; background: var(--ink, #111312); color: var(--paper, #f7f7f4); } .ds-tabbar-add svg { height: 18px; }"
+    },
+    {
+      "name": "Key Figures Plate",
+      "kind": "custom",
+      "refersTo": "key-figures-plate",
+      "description": "The one yellow plate per screen: verdict and period, the 56px signed net, money in and out in two ruled columns. Unchanged in dark mode.",
+      "html": "<section class=\"ds-plate\"><div class=\"ds-plate-head\"><p class=\"ds-plate-label\">Up · October 2026</p><p class=\"ds-plate-figure\">+$14,440</p></div><dl class=\"ds-plate-split\"><div><dt>Money in</dt><dd>$52,500</dd></div><div><dt>Money out</dt><dd>$38,060</dd></div></dl></section>",
+      "css": ".ds-plate { background: #ffd23f; color: #111312; border-radius: 4px; font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-variant-numeric: tabular-nums; } .ds-plate-head { padding: 16px 20px 20px; } .ds-plate-label { margin: 0; font-size: 13px; color: #4a3f12; } .ds-plate-figure { margin: 8px 0 0; font-size: 56px; line-height: 1; font-weight: 600; letter-spacing: -0.035em; } .ds-plate-split { display: grid; grid-template-columns: 1fr 1fr; margin: 0; border-top: 1px solid rgb(17 19 18 / 0.15); } .ds-plate-split > div { padding: 12px 20px; } .ds-plate-split > div + div { border-left: 1px solid rgb(17 19 18 / 0.15); } .ds-plate-split dt { font-size: 13px; color: #4a3f12; } .ds-plate-split dd { margin: 2px 0 0; font-size: 17px; font-weight: 600; }"
+    },
+    {
+      "name": "Entity Ranking",
+      "kind": "custom",
+      "refersTo": "entity-ranking",
+      "description": "Signature diverging chart: entities ranked by net on one continuous 1px ink centre axis that breaks around paper-backed labels; gains run right in green, losses left in red.",
+      "html": "<div class=\"ds-rank\"><span class=\"ds-rank-axis\"></span><ol><li><a href=\"#\"><span class=\"ds-rank-name\"><span>Brett Mulkey IT</span><span class=\"ds-rank-meta\">$18,400 in · $6,150 out</span></span><span class=\"ds-rank-track\"><span class=\"ds-rank-bar gain\" style=\"width:50%\"></span></span><span class=\"ds-rank-val gain\">+$12,250</span></a></li><li><a href=\"#\"><span class=\"ds-rank-name\"><span>Rental House 2</span><span class=\"ds-rank-meta\">$900 in · $3,400 out</span></span><span class=\"ds-rank-track\"><span class=\"ds-rank-bar loss\" style=\"width:10%\"></span></span><span class=\"ds-rank-val loss\">−$2,500</span></a></li></ol></div>",
+      "css": ".ds-rank { position: relative; font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-variant-numeric: tabular-nums; color: var(--ink, #111312); } .ds-rank-axis { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: var(--rule-strong, #111312); z-index: 1; pointer-events: none; } .ds-rank ol { list-style: none; margin: 0; padding: 0; border-bottom: 1px solid var(--rule, #d9dad5); } .ds-rank li + li { border-top: 1px solid var(--rule, #d9dad5); } .ds-rank a { display: grid; grid-template-columns: 1fr auto; row-gap: 6px; column-gap: 12px; align-items: center; padding: 10px 0; color: inherit; text-decoration: none; } .ds-rank a:hover, .ds-rank a:hover .ds-rank-name > span { background: var(--hover, #efefea); } .ds-rank-name > span { position: relative; z-index: 2; display: block; width: fit-content; padding-right: 6px; background: var(--paper, #f7f7f4); } .ds-rank-meta { font-size: 13px; color: var(--ink-3, #676c68); } .ds-rank-track { position: relative; grid-column: 1 / -1; grid-row: 2; height: 10px; } .ds-rank-bar { position: absolute; top: 0; bottom: 0; } .ds-rank-bar.gain { left: 50%; background: var(--gain-bar, #0b7a3e); } .ds-rank-bar.loss { right: 50%; background: var(--loss-bar, #d7261e); } .ds-rank-val { text-align: right; font-weight: 600; } .ds-rank-val.gain { color: var(--gain, #0b7a3e); } .ds-rank-val.loss { color: var(--loss, #c8231b); }"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Printed label: 12px text in a hairline box, 3px radius.",
+      "html": "<span class=\"ds-badge\">Preview</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; height: 20px; padding: 0 6px; border: 1px solid var(--rule, #d9dad5); border-radius: 3px; font-family: Geist, ui-sans-serif, system-ui, sans-serif; font-size: 12px; color: var(--ink-2, #464a47); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Key-Figures Page",
+    "overview": "The app reads like the key-figures spread of an annual report. Each screen leads with one number on a chrome-yellow plate, and everything below it is printed on paper: ink type, 1px rules, and a ranked chart. The page is built from type, rules, and figures. It has no cards, no shadows, no gradients, and no decorative imagery. Depth comes from the rules and from contrast in type size.\n\nDensity is moderate and phone-first. Rows are about 44 to 52px tall. A page has one column inside a 1024px measure, and everything sits on a 16px gutter (24px from `sm` up). Hierarchy comes from the size gap between the 56px display figure and 15px body text, and only two weights are used. Colour is scarce on purpose. Yellow marks the single figure the screen exists to show. Green and red tell you which way money moved, and they appear only where money is printed.\n\nDark mode follows `prefers-color-scheme`. Paper and ink swap, while the yellow plate keeps the same yellow and the same dark ink, so the figure you came for looks the same in either mode.",
+    "keyCharacteristics": [
+      "One yellow plate per screen, holding the net figure.",
+      "1px rules are the only containers. Corners are 4px or less, and nothing casts a shadow.",
+      "Geist with tabular figures throughout, in two weights (400 and 600).",
+      "Gain/loss colour appears on figures and bars only.",
+      "Signature: the ranked diverging entity chart on one continuous centre axis."
+    ],
+    "rules": [
+      { "name": "The One Plate Rule", "body": "Each screen has at most one yellow plate, and it holds the net figure for the current scope. Yellow is never used on buttons, badges, tabs, or highlights.", "section": "colors" },
+      { "name": "The Money Colour Rule", "body": "Green and red appear only on signed money figures and chart bars, plus red for errors and destructive actions. Labels, status words, icons, and control fills stay in ink.", "section": "colors" },
+      { "name": "The Constant Plate Rule", "body": "Dark mode swaps paper and ink and leaves the plate as it is: same yellow, same dark ink.", "section": "colors" },
+      { "name": "The Two Weights Rule", "body": "Only 400 and 600 exist. Signed figures, titles, buttons, and active tabs use 600. Everything else uses 400.", "section": "typography" },
+      { "name": "The No Kicker Rule", "body": "No uppercase, letter-spaced labels. A label is sentence-case 13px text in Graphite or Pencil.", "section": "typography" },
+      { "name": "The Ruled Page Rule", "body": "Containers are 1px rules. Lists, figures, and charts sit directly on the paper. Only forms and the plate are enclosed.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do give each screen at most one yellow plate, and put that screen's net figure on it.",
+      "Do contain things with 1px Hairline rules, open sections with a 2px ink rule and a 17px title, and mark active tabs with a 3px ink bar.",
+      "Do keep corners at 4px or less (3px on badges).",
+      "Do set every figure in Geist with tabular numerals at 600, signed, with gain/loss colour off the plate.",
+      "Do reuse the Entity Ranking for any comparison of entities, and keep its one continuous centre axis breaking around the labels.",
+      "Do keep the plate's yellow and its dark ink unchanged in dark mode."
+    ],
+    "donts": [
+      "Don't use any box-shadow for elevation, or rounded white cards to wrap lists, figures, or charts.",
+      "Don't use a font weight other than 400 or 600.",
+      "Don't put gain/loss colour on labels, status words, icons, or control fills.",
+      "Don't use yellow anywhere except the one plate and text selection.",
+      "Don't add uppercase tracked kickers or eyebrows above titles or figures."
+    ]
+  }
+}

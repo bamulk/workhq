@@ -6,6 +6,7 @@ import {
   subMonths,
   format,
 } from "date-fns";
+import { formatDate } from "@/lib/format";
 
 export type RangeKey = "month" | "ytd" | "last12" | "all" | "custom";
 
@@ -23,8 +24,8 @@ const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 export const RANGE_PRESETS: { key: RangeKey; label: string }[] = [
   { key: "month", label: "This month" },
-  { key: "ytd", label: "Year to date" },
-  { key: "last12", label: "Last 12 months" },
+  { key: "ytd", label: "This year" },
+  { key: "last12", label: "12 months" },
   { key: "all", label: "All time" },
 ];
 
@@ -62,11 +63,11 @@ export function resolveRange(sp: {
       const end = sp.to && ISO_RE.test(sp.to) ? sp.to : null;
       const label =
         start && end
-          ? `${start} → ${end}`
+          ? `${formatDate(start)} – ${formatDate(end)}`
           : start
-            ? `Since ${start}`
+            ? `Since ${formatDate(start)}`
             : end
-              ? `Through ${end}`
+              ? `Through ${formatDate(end)}`
               : "All time";
       return { key, start, end, label };
     }
