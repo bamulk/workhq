@@ -2,30 +2,46 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Building2,
-  ArrowLeftRight,
-  Upload,
-  BarChart3,
-  Wallet,
-} from "lucide-react";
+import { Plus, House, List, Building2, Menu } from "lucide-react";
 import SignOutButton from "./SignOutButton";
 
 type Item = {
   href: string;
   label: string;
-  icon: React.ComponentType<{ size?: number }>;
   match: (p: string) => boolean;
 };
 
-const items: Item[] = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard, match: (p) => p === "/" },
-  { href: "/entities", label: "Entities", icon: Building2, match: (p) => p.startsWith("/entities") },
-  { href: "/transactions", label: "Transactions", icon: ArrowLeftRight, match: (p) => p.startsWith("/transactions") },
-  { href: "/import", label: "Import", icon: Upload, match: (p) => p.startsWith("/import") },
-  { href: "/reports", label: "Reports", icon: BarChart3, match: (p) => p.startsWith("/reports") },
+const desktopItems: Item[] = [
+  { href: "/", label: "Overview", match: (p) => p === "/" },
+  { href: "/transactions", label: "Activity", match: (p) => p === "/transactions" || /^\/transactions\/(?!new)/.test(p) },
+  { href: "/entities", label: "Entities", match: (p) => p.startsWith("/entities") },
+  { href: "/reports", label: "Reports", match: (p) => p.startsWith("/reports") },
+  { href: "/import", label: "Import", match: (p) => p.startsWith("/import") },
 ];
+
+type TabItem = Item & { icon: React.ComponentType<{ size?: number; strokeWidth?: number }> };
+
+const tabItems: TabItem[] = [
+  { href: "/", label: "Overview", icon: House, match: (p) => p === "/" },
+  { href: "/transactions", label: "Activity", icon: List, match: (p) => p === "/transactions" || /^\/transactions\/(?!new)/.test(p) },
+  { href: "/transactions/new", label: "Add", icon: Plus, match: (p) => p === "/transactions/new" },
+  { href: "/entities", label: "Entities", icon: Building2, match: (p) => p.startsWith("/entities") },
+  {
+    href: "/more",
+    label: "More",
+    icon: Menu,
+    match: (p) => p.startsWith("/more") || p.startsWith("/reports") || p.startsWith("/import"),
+  },
+];
+
+function Wordmark() {
+  return (
+    <Link href="/" className="inline-flex items-center gap-2 font-semibold text-[17px] tracking-[-0.01em]">
+      <span aria-hidden className="w-2.5 h-2.5 bg-ink" />
+      Finances
+    </Link>
+  );
+}
 
 export default function NavBar({ displayName }: { displayName: string }) {
   const pathname = usePathname();
@@ -33,76 +49,74 @@ export default function NavBar({ displayName }: { displayName: string }) {
   return (
     <>
       <header
-        className="sticky top-0 z-[1100] backdrop-blur-md bg-white/90 dark:bg-slate-900/85 border-b border-slate-200 dark:border-slate-700/70"
+        className="sticky top-0 z-40 bg-paper border-b border-rule"
         style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <span className="w-8 h-8 rounded-lg bg-brand text-white inline-flex items-center justify-center">
-              <Wallet size={18} />
-            </span>
-            <span className="tracking-tight hidden md:inline">Finances</span>
-          </Link>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-12 md:h-14 flex items-center gap-6">
+          <Wordmark />
 
-          <nav className="hidden md:flex items-center gap-1 text-sm ml-4">
-            {items.map((n) => {
-              const Icon = n.icon;
+          <nav aria-label="Main" className="hidden md:flex items-stretch self-stretch gap-1">
+            {desktopItems.map((n) => {
               const active = n.match(pathname);
               return (
                 <Link
                   key={n.href}
                   href={n.href}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md ${
+                  aria-current={active ? "page" : undefined}
+                  className={`relative inline-flex items-center px-2.5 text-[14px] transition-colors duration-150 ${
                     active
-                      ? "bg-brand text-white"
-                      : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
+                      ? "font-semibold text-ink after:absolute after:inset-x-2.5 after:bottom-[-1px] after:h-[3px] after:bg-ink"
+                      : "text-ink-3 hover:text-ink"
                   }`}
                 >
-                  <Icon size={14} />
                   {n.label}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="ml-auto flex items-center gap-2 sm:gap-3 text-sm">
-            <span className="text-slate-700 dark:text-slate-300 hidden sm:block truncate max-w-[160px]">
-              {displayName}
-            </span>
+          <div className="ml-auto hidden md:flex items-center gap-4 text-[14px]">
+            <span className="text-ink-3 truncate max-w-[180px]">{displayName}</span>
             <SignOutButton />
+            <Link
+              href="/transactions/new"
+              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-[4px] bg-ink text-paper text-[13px] font-semibold hover:bg-ink-2"
+            >
+              <Plus size={16} strokeWidth={2.25} /> Add
+            </Link>
           </div>
         </div>
       </header>
 
-      {/* Mobile bottom tab bar */}
+      {/* Phone tab bar */}
       <nav
-        className="md:hidden fixed bottom-0 inset-x-0 z-[1100] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-700/70"
-        style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.5rem)" }}
+        aria-label="Main"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-paper border-t border-rule"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
-        <ul
-          className="grid max-w-lg mx-auto"
-          style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
-        >
-          {items.map((n) => {
+        <ul className="grid grid-cols-5 max-w-lg mx-auto">
+          {tabItems.map((n) => {
             const Icon = n.icon;
             const active = n.match(pathname);
+            const isAdd = n.href === "/transactions/new";
             return (
               <li key={n.href}>
                 <Link
                   href={n.href}
-                  className={`flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium ${
-                    active
-                      ? "text-brand"
-                      : "text-slate-600 dark:text-slate-400 active:text-slate-900 dark:active:text-slate-100"
-                  }`}
+                  aria-current={active ? "page" : undefined}
+                  className={`relative flex flex-col items-center justify-center gap-1 h-16 text-[11px] ${
+                    active ? "text-ink" : "text-ink-3"
+                  } ${active && !isAdd ? "before:absolute before:top-[-1px] before:inset-x-4 before:h-[3px] before:bg-ink" : ""}`}
                 >
-                  <span
-                    className={`inline-flex items-center justify-center w-9 h-6 rounded-full ${
-                      active ? "bg-brand/10" : ""
-                    }`}
-                  >
-                    <Icon size={18} />
-                  </span>
+                  {isAdd ? (
+                    <span className="inline-flex items-center justify-center w-10 h-7 rounded-[4px] bg-ink text-paper">
+                      <Icon size={18} strokeWidth={2.25} />
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center justify-center h-7">
+                      <Icon size={20} strokeWidth={active ? 2.25 : 1.75} />
+                    </span>
+                  )}
                   {n.label}
                 </Link>
               </li>

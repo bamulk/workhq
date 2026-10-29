@@ -1,63 +1,16 @@
-import Link from "next/link";
-import { Plus, Upload, Building2, Home, ArrowRight } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { Card, LinkButton, EmptyState } from "@/components/ui";
-import MoneyFlowCards from "@/components/MoneyFlowCards";
-import NetBar from "@/components/NetBar";
-import DateRangePicker from "@/components/DateRangePicker";
-import { formatSigned, netTone } from "@/lib/format";
+import { LinkButton, EmptyState, Section } from "@/components/ui";
+import KeyFigures from "@/components/KeyFigures";
+import EntityRanking from "@/components/EntityRanking";
+import PeriodTabs from "@/components/PeriodTabs";
 import { resolveRange } from "@/lib/ranges";
-import { summarize, summarizeByEntity, emptySummary, type FlowRow, type FlowSummary } from "@/lib/aggregate";
+import { summarize, summarizeByEntity, type FlowRow } from "@/lib/aggregate";
 import type { Entity } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-function EntityCard({ e, summary }: { e: Entity; summary: FlowSummary }) {
-  return (
-    <Link href={`/entities/${e.id}`}>
-      <Card className="p-4 hover:border-brand/40 h-full space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <span className="font-medium truncate">{e.name}</span>
-          <span className={`font-semibold text-sm ${netTone(summary.net)}`}>{formatSigned(summary.net)}</span>
-        </div>
-        <NetBar moneyIn={summary.moneyIn} moneyOut={summary.moneyOut} />
-      </Card>
-    </Link>
-  );
-}
-
-function EntitySection({
-  title,
-  icon: Icon,
-  list,
-  byEntity,
-}: {
-  title: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  list: Entity[];
-  byEntity: Map<string, FlowSummary>;
-}) {
-  if (list.length === 0) return null;
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-slate-500 dark:text-slate-400 flex items-center gap-2">
-          <Icon size={15} className="text-brand" /> {title}
-        </h2>
-        <Link href="/entities" className="text-xs text-brand hover:underline inline-flex items-center gap-1">
-          Manage <ArrowRight size={12} />
-        </Link>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {list.map((e) => (
-          <EntityCard key={e.id} e={e} summary={byEntity.get(e.id) ?? emptySummary()} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export default async function Dashboard({
+export default async function Overview({
   searchParams,
 }: {
   searchParams: Promise<{ range?: string; from?: string; to?: string }>;
@@ -82,39 +35,38 @@ export default async function Dashboard({
   const consolidated = summarize(rows);
   const byEntity = summarizeByEntity(rows);
 
-  const businesses = entities.filter((e) => e.type === "business");
-  const rentals = entities.filter((e) => e.type === "rental");
-
   return (
-    <div className="space-y-8">
-      <div className="flex items-start justify-between gap-4 flex-col sm:flex-row">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-            Money in vs money out · {range.label}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <LinkButton href="/transactions/new" variant="secondary"><Plus size={14} /> Add</LinkButton>
-          <LinkButton href="/import" variant="secondary"><Upload size={14} /> Import</LinkButton>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <h1 className="sr-only">Overview</h1>
+      <PeriodTabs current={range.key} from={sp.from} to={sp.to} />
 
-      <DateRangePicker current={range.key} from={sp.from} to={sp.to} />
-
-      <MoneyFlowCards summary={consolidated} />
+      <KeyFigures summary={consolidated} label={range.label} />
 
       {entities.length === 0 ? (
         <EmptyState
-          title="No entities yet"
-          description="Add your businesses and rental houses, then record or import their income and expenses."
-          action={<LinkButton href="/entities/new"><Plus size={14} /> Add your first entity</LinkButton>}
+          title="No businesses or rentals yet"
+          description="Add one, then record or import its money in and out."
+          action={<LinkButton href="/entities/new"><Plus size={16} /> Add a business or rental</LinkButton>}
         />
       ) : (
-        <>
-          <EntitySection title="Businesses" icon={Building2} list={businesses} byEntity={byEntity} />
-          <EntitySection title="Rental houses" icon={Home} list={rentals} byEntity={byEntity} />
-        </>
+        <Section title="By entity" aside={`${entities.length} tracked`}>
+          {consolidated.count === 0 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 py-3 border-b border-rule">
+              <p className="text-ink-2">
+                {range.key === "all"
+                  ? "Nothing recorded yet."
+                  : range.key === "last12"
+                    ? "Nothing recorded in the last 12 months."
+                    : `Nothing recorded for ${range.label} yet.`}
+              </p>
+              <div className="flex gap-2">
+                <LinkButton href="/transactions/new" size="sm"><Plus size={14} /> Add</LinkButton>
+                <LinkButton href="/import" size="sm" variant="secondary"><Upload size={14} /> Import CSV</LinkButton>
+              </div>
+            </div>
+          )}
+          <EntityRanking entities={entities} byEntity={byEntity} />
+        </Section>
       )}
     </div>
   );

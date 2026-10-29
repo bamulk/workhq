@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Card, Field, Input, Select, Textarea } from "@/components/ui";
+import { ArrowDownLeft, ArrowUpRight, ChevronDown } from "lucide-react";
+import { Field, Input, Select, Textarea } from "@/components/ui";
 import SubmitButton from "@/components/SubmitButton";
 import { todayISO } from "@/lib/format";
 import type { Transaction, Category, Direction } from "@/lib/types";
@@ -35,43 +36,55 @@ export default function TransactionForm({
     if (c.applies_to === "any") return true;
     return selectedEntity ? c.applies_to === selectedEntity.type : true;
   });
+  const hasDetails = Boolean(t.counterparty || t.method || t.notes);
 
-  const toggleClass = (active: boolean, tone: "in" | "out") =>
-    `flex-1 px-3 py-2 text-sm font-medium rounded-lg border transition-colors ${
-      active
-        ? tone === "in"
-          ? "bg-emerald-500 text-white border-emerald-500"
-          : "bg-rose-500 text-white border-rose-500"
-        : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+  const toggle = (active: boolean) =>
+    `flex-1 inline-flex items-center justify-center gap-2 h-11 text-[15px] font-semibold transition-colors duration-150 ${
+      active ? "bg-ink text-paper" : "bg-surface text-ink-2 hover:text-ink"
     }`;
 
   return (
-    <Card className="p-5">
-      <form action={action} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Direction toggle */}
-        <div className="sm:col-span-2">
-          <span className="text-xs font-medium text-slate-600 dark:text-slate-400 block mb-1">
-            Direction
-          </span>
-          <input type="hidden" name="direction" value={direction} />
-          <div className="flex gap-2">
-            <button type="button" className={toggleClass(direction === "in", "in")} onClick={() => setDirection("in")}>
-              ↓ Money in
-            </button>
-            <button type="button" className={toggleClass(direction === "out", "out")} onClick={() => setDirection("out")}>
-              ↑ Money out
-            </button>
-          </div>
-        </div>
+    <form action={action} className="space-y-5 max-w-xl">
+      <input type="hidden" name="direction" value={direction} />
+      <div role="radiogroup" aria-label="Direction" className="flex rounded-[4px] border border-rule overflow-hidden divide-x divide-rule">
+        <button
+          type="button"
+          role="radio"
+          aria-checked={direction === "in"}
+          className={toggle(direction === "in")}
+          onClick={() => setDirection("in")}
+        >
+          <ArrowDownLeft size={18} /> Money in
+        </button>
+        <button
+          type="button"
+          role="radio"
+          aria-checked={direction === "out"}
+          className={toggle(direction === "out")}
+          onClick={() => setDirection("out")}
+        >
+          <ArrowUpRight size={18} /> Money out
+        </button>
+      </div>
 
-        <Field label="Entity">
-          <Select
-            name="entity_id"
-            value={entityId}
-            onChange={(e) => setEntityId(e.target.value)}
+      <Field label="Amount">
+        <div className="relative">
+          <span aria-hidden className="absolute left-3 top-1/2 -translate-y-1/2 text-[24px] font-semibold text-ink-3">$</span>
+          <Input
+            name="amount"
+            inputMode="decimal"
+            placeholder="0.00"
+            defaultValue={t.amount?.toString() ?? ""}
             required
-          >
-            {entities.length === 0 && <option value="">— No entities —</option>}
+            className="h-14 pl-8 text-[28px] sm:text-[28px] font-semibold tracking-[-0.02em]"
+          />
+        </div>
+      </Field>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Field label="Entity">
+          <Select name="entity_id" value={entityId} onChange={(e) => setEntityId(e.target.value)} required>
+            {entities.length === 0 && <option value="">No entities</option>}
             {entities.map((e) => (
               <option key={e.id} value={e.id}>
                 {e.name}
@@ -84,19 +97,9 @@ export default function TransactionForm({
           <Input type="date" name="occurred_on" defaultValue={t.occurred_on ?? todayISO()} required />
         </Field>
 
-        <Field label="Amount" hint="Always positive — the toggle sets in vs out.">
-          <Input
-            name="amount"
-            inputMode="decimal"
-            placeholder="0.00"
-            defaultValue={t.amount?.toString() ?? ""}
-            required
-          />
-        </Field>
-
         <Field label="Category">
           <Select name="category_id" defaultValue={t.category_id ?? ""}>
-            <option value="">— Uncategorized —</option>
+            <option value="">Uncategorized</option>
             {visibleCategories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -105,38 +108,40 @@ export default function TransactionForm({
           </Select>
         </Field>
 
-        <Field label="Payer / Payee">
-          <Input name="counterparty" defaultValue={t.counterparty ?? ""} placeholder="Tenant, client, vendor…" />
+        <Field label="Description">
+          <Input name="description" defaultValue={t.description ?? ""} placeholder="What was this for?" />
         </Field>
+      </div>
 
-        <Field label="Method">
-          <Select name="method" defaultValue={t.method ?? ""}>
-            <option value="">—</option>
-            <option value="zelle">Zelle</option>
-            <option value="venmo">Venmo</option>
-            <option value="bank">Bank transfer</option>
-            <option value="check">Check</option>
-            <option value="card">Card</option>
-            <option value="cash">Cash</option>
-          </Select>
-        </Field>
-
-        <div className="sm:col-span-2">
-          <Field label="Description">
-            <Input name="description" defaultValue={t.description ?? ""} placeholder="What was this?" />
+      <details open={hasDetails} className="group border-t border-rule pt-3">
+        <summary className="inline-flex items-center gap-1.5 h-9 text-[14px] text-ink-2 hover:text-ink">
+          More details
+          <ChevronDown size={16} className="transition-transform duration-150 group-open:rotate-180" />
+        </summary>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+          <Field label="Paid by / paid to">
+            <Input name="counterparty" defaultValue={t.counterparty ?? ""} placeholder="Tenant, client, vendor" />
           </Field>
-        </div>
-
-        <div className="sm:col-span-2">
-          <Field label="Notes">
-            <Textarea name="notes" rows={2} defaultValue={t.notes ?? ""} />
+          <Field label="Method">
+            <Select name="method" defaultValue={t.method ?? ""}>
+              <option value="">Not set</option>
+              <option value="zelle">Zelle</option>
+              <option value="venmo">Venmo</option>
+              <option value="bank">Bank transfer</option>
+              <option value="check">Check</option>
+              <option value="card">Card</option>
+              <option value="cash">Cash</option>
+            </Select>
           </Field>
+          <div className="sm:col-span-2">
+            <Field label="Notes">
+              <Textarea name="notes" rows={3} defaultValue={t.notes ?? ""} />
+            </Field>
+          </div>
         </div>
+      </details>
 
-        <div className="sm:col-span-2 flex justify-end">
-          <SubmitButton>{submitLabel}</SubmitButton>
-        </div>
-      </form>
-    </Card>
+      <SubmitButton className="w-full sm:w-auto">{submitLabel}</SubmitButton>
+    </form>
   );
 }

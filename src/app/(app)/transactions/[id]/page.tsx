@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { PageHeader, Badge } from "@/components/ui";
+import { PageHeader } from "@/components/ui";
 import DeleteButton from "@/components/DeleteButton";
 import TransactionForm from "@/components/TransactionForm";
 import { updateTransactionAction, deleteTransactionAction } from "../actions";
@@ -27,25 +26,19 @@ export default async function TransactionDetailPage({
 
   const updateAction = updateTransactionAction.bind(null, id);
   const deleteAction = deleteTransactionAction.bind(null, id);
+  const origin = txn.import_batch_id
+    ? "Imported from CSV"
+    : txn.source === "manual"
+      ? "Added by hand"
+      : `From ${titleize(txn.source)}`;
 
   return (
     <div className="space-y-6">
-      <div>
-        <Link href="/transactions" className="text-sm text-slate-600 dark:text-slate-400 hover:underline">
-          ← All transactions
-        </Link>
-      </div>
       <PageHeader
         title="Edit transaction"
-        actions={
-          <DeleteButton action={deleteAction} label="Delete" />
-        }
+        subtitle={origin}
+        back={{ href: "/transactions", label: "Activity" }}
       />
-      <div className="flex items-center gap-2 text-xs text-slate-400">
-        <Badge tone={txn.direction}>{txn.direction === "in" ? "Money in" : "Money out"}</Badge>
-        <span>Source: {titleize(txn.source)}</span>
-        {txn.import_batch_id && <span>· imported</span>}
-      </div>
       <TransactionForm
         action={updateAction}
         txn={txn}
@@ -53,6 +46,9 @@ export default async function TransactionDetailPage({
         categories={categories ?? []}
         submitLabel="Save changes"
       />
+      <div className="max-w-xl border-t border-rule pt-5">
+        <DeleteButton action={deleteAction} label="Delete transaction" />
+      </div>
     </div>
   );
 }

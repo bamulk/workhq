@@ -6,7 +6,7 @@ import { Button } from "@/components/ui";
 export default function DeleteButton({
   action,
   label = "Delete",
-  confirmText = "Delete this item? This cannot be undone.",
+  confirmText = "Delete this? It can't be undone.",
 }: {
   action: () => void | Promise<void>;
   label?: string;
